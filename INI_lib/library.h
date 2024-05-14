@@ -20,7 +20,24 @@ public:
             if (section.find(key) != section.end()) {
                 std::istringstream iss(section.at(key));
                 T value;
-                std::getline(iss, value);
+                std::string string_value;
+                std::getline(iss, string_value);
+
+                if constexpr (std::is_same<int, T>::value) {
+                    value = std::stoi(string_value);
+                }
+                else if constexpr (std::is_same<double, T>::value) {
+                    std::replace(string_value.begin(), string_value.end(), ',', '.');
+                    value = std::stod(string_value);
+                }
+                else if constexpr (std::is_same<std::string, T>::value) {
+                    value = string_value;
+                }
+                else if(sizeof(T) == -1)
+                {
+                    throw std::invalid_argument("Нельзя перевести этот тип");
+                }
+
                 if (iss.fail()) {
                     throw std::invalid_argument("Ошибка преобразования значения");
                 }
